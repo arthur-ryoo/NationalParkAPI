@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using ParkyAPI.NationalParkMapper;
 
 namespace ParkyAPI
 {
@@ -35,6 +37,9 @@ namespace ParkyAPI
 
             // Add repository
             services.AddScoped<INationalParkRepository, NationalParkRepository>();
+
+            // Add auto mapper
+            services.AddAutoMapper(typeof(NationalParkMappings));
 
             services.AddControllers();
         }
