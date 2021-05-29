@@ -11,8 +11,13 @@ using System.Threading.Tasks;
 
 namespace ParkyAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/nationalparks")]
+    //[Route("api/[controller]")]
     [ApiController]
+
+    // To group for swagger
+    //[ApiExplorerSettings(GroupName = "ParkyOpenAPISpecNP")]
+
     // Global status code attribute
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public class NationalParksController : Controller
@@ -105,7 +110,8 @@ namespace ParkyAPI.Controllers
             }
 
             // to return created object
-            return CreatedAtRoute("GetNationalPark", new { nationalParkId = nationalParkObj.Id}, nationalParkObj);
+            return CreatedAtRoute("GetNationalPark", new { version=HttpContext.GetRequestedApiVersion().ToString(),
+                                                        nationalParkId = nationalParkObj.Id}, nationalParkObj);
         }
 
         [HttpPatch("{nationalParkId:int}", Name = "UpdateNationalPark")]
