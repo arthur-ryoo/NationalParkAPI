@@ -57,21 +57,39 @@ namespace ParkyWeb.Repository
         public async Task<IEnumerable<T>> GetAllAsync(string url)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
-
             var client = _clientFactory.CreateClient();
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            // This is the extra code to validate the SSL
+            var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
             {
-                var jsonString = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<IEnumerable<T>>(jsonString);
+                return true;
+            };
+            client = new HttpClient(httpClientHandler) { BaseAddress = new Uri(url) };
+            // end of the extra code
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(request);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<IEnumerable<T>>(jsonString);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("Response " + ex.InnerException.Message);
+                }
+
             }
             return null;
         }
 
         public async Task<T> GetAsync(string url, int Id)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, url+Id);
 
             var client = _clientFactory.CreateClient();
             HttpResponseMessage response = await client.SendAsync(request);
