@@ -38,7 +38,8 @@ namespace ParkyWeb.Controllers
                 {
                     Text = i.Name,
                     Value = i.Id.ToString()
-                })
+                }),
+                Trail = new Trail()
             };
 
             if (id == null)
@@ -75,7 +76,18 @@ namespace ParkyWeb.Controllers
             }
             else
             {
-                return View(obj);
+                IEnumerable<NationalPark> npList = await _npRepo.GetAllAsync(SD.NationalParkAPIPath);
+
+                TrailsVM objVM = new TrailsVM()
+                {
+                    NationalParkList = npList.Select(i => new SelectListItem
+                    {
+                        Text = i.Name,
+                        Value = i.Id.ToString()
+                    }),
+                    Trail = obj.Trail
+                };
+                return View(objVM);
             }
         }
 
